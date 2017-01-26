@@ -51,6 +51,14 @@ namespace DapperQueryBuilder.Core
             return this;
         }
 
+        public DapperQueryBuilder GetRowsPaged(string fieldToOrderBy, int page,
+            int resultSetCount)
+        {
+            _selectQueryBuilder.GetRowsPaged(fieldToOrderBy, page, resultSetCount);
+
+            return this;
+        }
+
         public DapperQueryBuilder Where(string condition)
         {
             _selectQueryBuilder.Where(condition);

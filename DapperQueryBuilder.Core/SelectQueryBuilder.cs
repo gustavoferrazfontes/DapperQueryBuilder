@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System;
+using Dapper;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace DapperQueryBuilder.Core
 
         public void Select(string tableName)
         {
-            Query.AppendFormat("SELECT * FROM {0}", tableName);
+            Query.Append($"SELECT * FROM {tableName}");
         }
 
         public void Top(int top)
@@ -33,22 +34,33 @@ namespace DapperQueryBuilder.Core
 
         public void Where(string condition)
         {
-            Query.AppendFormat(" WHERE {0}", condition);
+            Query.Append($" WHERE {condition}");
         }
 
         public void And(string condition)
         {
-            Query.AppendFormat(" AND {0}", condition);
+            Query.Append($" AND {condition}");
         }
 
         public void Or(string condition)
         {
-            Query.AppendFormat(" OR {0}", condition);
+            Query.Append($" OR {condition}");
         }
 
         public string ShowQuery()
         {
             return BuildQuery();
+        }
+
+        public void GetRowsPaged(string fieldToOrderBy, int page,
+            int resultSetCount)
+        {
+            if (string.IsNullOrWhiteSpace(fieldToOrderBy))
+                throw new ArgumentNullException("The field to ordering is required");
+
+            Query.Append($" ORDER {fieldToOrderBy}");
+            Query.Append($" OFFSET {page} ROWS");
+            Query.Append($" FETCH NEXT {resultSetCount} ROWS ONLY");
         }
 
         public IEnumerable<T> GoQuery<T>(string connectionString) where T : class

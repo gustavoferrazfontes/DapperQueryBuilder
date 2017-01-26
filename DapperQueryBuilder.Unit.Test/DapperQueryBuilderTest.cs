@@ -67,5 +67,19 @@ namespace DapperQueryBuilder.Unit.Test
                 .Should()
                 .Be("SELECT TOP 10 Name FROM User");
         }
+
+        [Fact]
+        public void WhenCallSelectWithPaginationShouldCreateCorrectQuery()
+        {
+            _dapperQueryBuilder
+                .Select("User")
+                .WithColumn("Name")
+                .GetRowsPaged("Name", 1, 10);
+
+            _dapperQueryBuilder
+                .ShowQuery()
+                .Should()
+                .Be("SELECT Name FROM User ORDER Name OFFSET 1 ROWS FETCH NEXT 10 ROWS ONLY");
+        }
     }
 }

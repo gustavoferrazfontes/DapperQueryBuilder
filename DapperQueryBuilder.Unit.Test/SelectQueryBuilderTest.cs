@@ -105,6 +105,17 @@ namespace DapperQueryBuilder.Unit.Test
         }
 
         [Fact]
+        public void WhenCallPaginationMethodShouldAddPaginationCriteriaToQuery()
+        {
+            _selectQueryBuilder.Select("User");
+            _selectQueryBuilder.WithColumn("Name");
+            _selectQueryBuilder.GetRowsPaged("Name", 1, 10);
+            _selectQueryBuilder.ShowQuery()
+                .Should()
+                .Be("SELECT Name FROM User ORDER Name OFFSET 1 ROWS FETCH NEXT 10 ROWS ONLY");
+        }
+
+        [Fact]
         public void WhenCallDistinctAndTopMethodShoulAddDistinctAndTopToQuery()
         {
             _selectQueryBuilder.Select("User");
