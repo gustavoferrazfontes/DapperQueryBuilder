@@ -17,6 +17,23 @@ namespace DapperQueryBuilder.Core
             Query.Append($"SELECT * FROM {tableName}");
         }
 
+        public void Join(string tableName)
+        {
+            joinTable = tableName;
+            Query.Append($" INNER JOIN {joinTable} ON");
+        }
+
+        public void LeftKey(string[] keys)
+        {
+            keys.ToList().ForEach(k => LeftKeys.Add(k));
+
+        }
+
+        public void RightKey(string[] keys)
+        {
+            keys.ToList().ForEach(k => RightKeys.Add(k));
+        }
+
         public void Top(int top)
         {
             _top = top;
@@ -80,6 +97,34 @@ namespace DapperQueryBuilder.Core
             query = BuildQueryWithTop(query);
             query = BuildQueryWithColumns(query);
             return query;
+        }
+
+        public void BuildJoin()
+        {
+            if (!LeftKeys.Any() || !RightKeys.Any()) return;
+
+            var unionKeys = LeftKeys.Zip(RightKeys, (l, r) => new { Left = l, Right = r }).ToList();
+
+            var join = new StringBuilder();
+            unionKeys.ForEach(item =>
+            {
+                if (join.Length > 0)
+                    join.Append($" AND {item.Left} = {item.Right}");
+                else
+                    join.Append($"{item.Left} = {item.Right}");
+
+            });
+           
+            Query = Query.Replace($"{joinTable} ON", $"{joinTable} ON {join.ToString()}");
+            ClearJoiVariable();
+          
+        }
+
+        private void ClearJoiVariable()
+        {
+            LeftKeys.Clear();
+            RightKeys.Clear();
+            joinTable = string.Empty;
         }
 
         private string BuildQueryWithColumns(string query)

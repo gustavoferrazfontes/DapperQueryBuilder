@@ -34,7 +34,7 @@ namespace DapperQueryBuilder.Core
 
         public DapperQueryBuilder Select(string tableName)
         {
-            if (_selectQueryBuilder == null) _selectQueryBuilder = new SelectQueryBuilder();
+            _selectQueryBuilder = _selectQueryBuilder ?? new SelectQueryBuilder();
 
             _selectQueryBuilder.Select(tableName);
             return this;
@@ -68,6 +68,25 @@ namespace DapperQueryBuilder.Core
         public DapperQueryBuilder WithColumn(string columnName)
         {
             _selectQueryBuilder.WithColumn(columnName);
+            return this;
+        }
+
+        public DapperQueryBuilder Join(string tableName)
+        {
+            _selectQueryBuilder.Join(tableName);
+            return this;
+        }
+
+        public DapperQueryBuilder LeftKey(params string[] keys)
+        {
+            _selectQueryBuilder.LeftKey(keys);
+            return this;
+        }
+
+        public DapperQueryBuilder RightKey(params string[] keys)
+        {
+            _selectQueryBuilder.RightKey(keys);
+            _selectQueryBuilder.BuildJoin();
             return this;
         }
     }

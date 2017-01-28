@@ -81,5 +81,53 @@ namespace DapperQueryBuilder.Unit.Test
                 .Should()
                 .Be("SELECT Name FROM User ORDER Name OFFSET 1 ROWS FETCH NEXT 10 ROWS ONLY");
         }
+
+        [Fact]
+        public void WhenCallSelectMethodWithJoinCreateCorrectQuery()
+        {
+            _dapperQueryBuilder
+                .Select("User")
+                .Join("Permission")
+                .LeftKey("Id")
+                .RightKey("UserId");
+
+            _dapperQueryBuilder.ShowQuery()
+                .Should()
+                .Be("SELECT * FROM User INNER JOIN Permission ON Id = UserId");
+
+        }
+
+        [Fact]
+        public void WhenCallSelectMethodWithManyKeysJoinCreateCorrectQuery()
+        {
+            _dapperQueryBuilder
+                .Select("User")
+                .Join("Permission")
+                .LeftKey("Id", "levelId")
+                .RightKey("UserId", "IdLevel");
+            _dapperQueryBuilder.ShowQuery()
+                .Should()
+                .Be("SELECT * FROM User INNER JOIN Permission ON Id = UserId AND levelId = IdLevel");
+        }
+
+        [Fact]
+        public void WhenCallSelectMethodTwoJoinsCreateCorrectQuery()
+        {
+            _dapperQueryBuilder
+                .Select("User")
+                .Join("Permission")
+                    .LeftKey("Id", "levelId")
+                    .RightKey("UserId", "IdLevel")
+                .Join("Customer")
+                    .LeftKey("CustomerId")
+                    .RightKey("Id");
+
+            _dapperQueryBuilder.ShowQuery()
+                .Should()
+                .Be(@"SELECT * FROM User INNER JOIN Permission ON Id = UserId AND levelId = IdLevel INNER JOIN Customer ON CustomerId = Id");
+
+        }
+
+
     }
 }
